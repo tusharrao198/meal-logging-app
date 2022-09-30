@@ -82,14 +82,26 @@ app.get("/", async (req, res) => {
 	// console.log(req.session.user)
 	const hashtags = await hashtagsInfo();
 	const fooditems = await fooditemsInfo();
-	const context = {
+	const userDetails = require("./models/User");
+	let context = {
 		hashtags: hashtags,
 		fooditems: fooditems,
 	};
-	res.render("addfoodlog", {
-		authenticated: req.isAuthenticated(),
-		...context,
-	});
+	if (req.isAuthenticated()) {
+		const userID = req.user._id;
+		let user = await userDetails.findOne({ _id: userID });
+		res.render("addfoodlog", {
+			authenticated: req.isAuthenticated(),
+			username:
+				user != null || user !== undefined ? user.displayName : null,
+			...context,
+		});
+	} else {
+		res.render("addfoodlog", {
+			authenticated: false,
+			...context,
+		});
+	}
 });
 //The 404 Route (ALWAYS Keep this as the last route)
 app.get("*", function (req, res) {

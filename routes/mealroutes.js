@@ -2,6 +2,7 @@ const router = require("express").Router();
 const {
 	findUserFoodLog,
 	createFoodLog,
+	updatefoodlog,
 	hashtagsInfo,
 	fooditemsInfo,
 } = require("../utils");
@@ -9,14 +10,18 @@ var url = require("url");
 const { authCheck } = require("../middleware/auth");
 
 router.get("/foodlog", authCheck, async (req, res) => {
+	const userDetails = require("../models/User");
 	const hashtags = await hashtagsInfo();
 	const fooditems = await fooditemsInfo();
+	const userID = req.user._id;
+	let user = await userDetails.findOne({ _id: userID });
 	const context = {
 		hashtags: hashtags,
 		fooditems: fooditems,
 	};
 	res.render("addfoodlog", {
 		authenticated: true,
+		username: user != null || user !== undefined ? user.displayName : null,
 		...context,
 	});
 });
@@ -30,27 +35,23 @@ router.get("/showfoodlog", authCheck, async (req, res) => {
 
 // create food log for user
 router.post("/foodlog", authCheck, async (req, res) => {
+	console.log(req.body);
+	const { hashtags, fooditems } = req.body;
 	const userDetails = require("../models/User");
 	const mealDetails = require("../models/meal");
 	const userID = req.user._id;
 
 	let user = await userDetails.findOne({ _id: userID });
 	if (user) {
-		// console.log("user");
 		let mealdata = await mealDetails.findOne({ UserId: String(userID) });
-		let HashTagsList = ["A", "B"];
-		let FoodItemsList = ["C", "D"];
-
 		console.log("new user  with meal data");
 		const data = {
-			username: user.username,
-			HashTags: HashTagsList,
-			FoodItems: FoodItemsList,
+			username: user.displayName,
+			HashTags: hashtags,
+			FoodItems: fooditems,
 		};
 		await createFoodLog(req, data);
 		res.redirect(`/meallogs`);
-
-		// await updatefoodlog(req, data);
 	} else {
 		res.setHeader("Content-Type", "application/json");
 		res.end(JSON.stringify({ msg: "No user logged in!" }));

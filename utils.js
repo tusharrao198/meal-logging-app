@@ -20,21 +20,34 @@ module.exports = {
 		let mealdata = await mealDetails.find({ UserId: String(userID) });
 		return mealdata;
 	},
-
 	createFoodLog: async function (req, data) {
-		// const formDetails = req.body;
 		const userID = req.user._id;
 		const mealDetails = require("./models/meal");
 		let mealdata = await mealDetails.find({ UserId: String(userID) });
 		const mealTable = require("./models/meal");
 		let user_id = String(req.user._id);
 
+		let hasht = [];
+		let foodt = [];
+
+		for (let i = 0; i < data.HashTags.length; i++) {
+			let obj = {};
+			obj["name"] = data.HashTags[i];
+			hasht.push(obj);
+		}
+
+		for (let i = 0; i < data.FoodItems.length; i++) {
+			let obj = {};
+			obj["name"] = data.FoodItems[i];
+			foodt.push(obj);
+		}
+
 		let newmeal = new mealTable({
 			logId: mealdata != null ? mealdata.length + 1 : 0,
 			UserId: user_id,
 			username: data.username,
-			HashTags: [],
-			FoodItems: [],
+			HashTags: hasht,
+			FoodItems: foodt,
 		});
 
 		newmeal.save(function (err) {
@@ -44,24 +57,4 @@ module.exports = {
 			}
 		});
 	},
-
-	// updatefoodlog: async function (req, data) {
-	// 	let user_id = String(req.user._id);
-	// 	const mealTable = require("./models/meal");
-	// 	if (user_id) {
-	// 		console.log("user found : ", user_id);
-	// 		await mealTable.updateOne(
-	// 			{ UserId: user_id },
-	// 			{
-	// 				$push: {
-	// 					FoodItems: {
-	// 						name: "AVC",
-	// 					},
-	// 				},
-	// 			}
-	// 		);
-	// 	} else {
-	// 		console.log("user not  found : ", user_id);
-	// 	}
-	// },
 };
