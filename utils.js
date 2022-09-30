@@ -29,16 +29,28 @@ module.exports = {
 
 		let hasht = [];
 		let foodt = [];
-
-		for (let i = 0; i < data.HashTags.length; i++) {
+		let checkh = Array.isArray(data.HashTags);
+		let checkf = Array.isArray(data.FoodItems);
+		if (checkh) {
+			for (let i = 0; i < data.HashTags.length; i++) {
+				let obj = {};
+				obj["name"] = data.HashTags[i];
+				hasht.push(obj);
+			}
+		} else {
 			let obj = {};
-			obj["name"] = data.HashTags[i];
+			obj["name"] = data.HashTags;
 			hasht.push(obj);
 		}
-
-		for (let i = 0; i < data.FoodItems.length; i++) {
+		if (checkf) {
+			for (let i = 0; i < data.FoodItems.length; i++) {
+				let obj = {};
+				obj["name"] = data.FoodItems[i];
+				foodt.push(obj);
+			}
+		} else {
 			let obj = {};
-			obj["name"] = data.FoodItems[i];
+			obj["name"] = data.FoodItems;
 			foodt.push(obj);
 		}
 
