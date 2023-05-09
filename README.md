@@ -1,1 +1,2 @@
-# meal-logging-app
+# SyncShareX
+Realtime File Sync
